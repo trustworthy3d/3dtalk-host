@@ -1,0 +1,165 @@
+<div id="offline_overlay" xmlns="http://www.w3.org/1999/html">
+    <div id="offline_overlay_background"></div>
+    <div id="offline_overlay_wrapper">
+        <div class="container">
+            <div class="hero-unit">
+                <h1>列印服務被斷開</h1>
+                <p id="offline_overlay_message">
+                    由於列印服務被斷開，因而現不能從它獲取任何回應。目前正在努力嘗試自動<strong>在接下來的幾分鐘重新連接它</strong>，當然您也可以通過點擊下麵的按鈕，嘗試手動重連。
+                </p>
+                <p>
+                    <a class="btn btn-primary btn-large" id="offline_overlay_reconnect">嘗試手動重連</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="drop_overlay" data-bind="visible: loginState.isUser()">
+    <div id="drop_overlay_background"></div>
+    <div id="drop_overlay_wrapper">
+        {% if enableSdSupport %}
+            <div class="dropzone" id="drop_locally"><span class="centered"><i class="icon-upload-alt"></i><br>上傳到本地</span></div>
+            <div class="dropzone_background" id="drop_locally_background"></div>
+            <div class="dropzone" id="drop_sd"><span class="centered"><i class="icon-upload-alt"></i><br>上傳到SD卡<br><small data-bind="visible: !isSdReady()">(SD卡未初始化)</small></span></div>
+            <div class="dropzone_background" id="drop_sd_background"></div>
+        {% else %}
+            <div class="dropzone" id="drop"><span class="centered"><i class="icon-upload-alt"></i><br>上傳</span></div>
+            <div class="dropzone_background" id="drop_background"></div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="confirmation_dialog" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+        <h3>您確定嗎？</h3>
+    </div>
+    <div class="modal-body">
+        <p class="confirmation_dialog_message"></p>
+        <p>您確定您要繼續操作嗎？</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">取消</a>
+        <a href="#" class="btn btn-danger confirmation_dialog_acknowledge">繼續</a>
+    </div>
+</div>
+
+<div id="first_run_dialog" class="modal hide fade" data-backdrop="static" data-keyboard="false">
+    <div class="modal-header">
+        <h3><i class="icon-warning-sign"></i> 配置許可權控制</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+            <strong>請仔細閱讀下麵的資訊，這對於您的印表機安全是至關重要的！</strong>
+        </p>
+        <p>
+            3DTALK默認是啟用許可權控制訪問機制的，這就意味著您現在必須首先配置一個用於登錄印表機的帳戶，否則您將不能進行任何操作。這樣做的原因在於，<strong>可以盡可能有效的防止陌生獲得您的印表機操作許可權，並惡意操作您的印表機。</strong> 因為對於一個可以通過互聯網訪問並實現列印控制的印表機，它是如此的不安全。(安全第一，您說呢？)。
+        </p>
+        <p>
+            目前您還未配置您的訪問控制權限。請 <strong>設置一個用戶和密碼</strong> 然後點擊“總是開啟許可權控制”按鈕，之後您設置的用戶將被初始化為一個管理員帳戶，您可以通過它獲得訪問、控制、或設置印表機的全部許可權。接下來，請開啟您的安全之旅吧：
+        </p>
+        <form class="form-horizontal">
+            <div class="control-group" data-bind="css: {success: validUsername()}">
+                <label class="control-label" for="first_run_username">用戶名</label>
+                <div class="controls">
+                    <input type="text" class="input-medium" data-bind="value: username, valueUpdate: 'afterkeydown'">
+                </div>
+            </div>
+            <div class="control-group" data-bind="css: {success: validPassword()}">
+                <label class="control-label" for="first_run_username">密碼</label>
+                <div class="controls">
+                    <input type="password" class="input-medium" data-bind="value: password, valueUpdate: 'afterkeydown'">
+                </div>
+            </div>
+            <div class="control-group" data-bind="css: {error: passwordMismatch(), success: validPassword() && !passwordMismatch()}">
+                <label class="control-label" for="first_run_username">確認密碼</label>
+                <div class="controls">
+                    <input type="password" class="input-medium" data-bind="value: confirmedPassword, valueUpdate: 'afterkeydown'">
+                    <span class="help-inline" data-bind="visible: passwordMismatch()">兩次密碼不匹配</span>
+                </div>
+            </div>
+        </form>
+        <p>
+            <strong>注意：</strong> 如果您確定您的印表機只是被置於一個您認為安全的網路中，並且您也不想限制其他人操作您的印表機的許可權。我們也提供您另一個選擇，通過點擊“關閉許可權控制”按鈕，從而不必配置任何許可權。
+        </p>
+        <p>
+            <strong>當然請千萬不要低估來自於互聯網上操作您的印表機的這一風險！</strong>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn btn-danger" data-bind="click: disableAccessControl">關閉許可權控制</a>
+        <a href="#" class="btn btn-primary" data-bind="click: keepAccessControl, enable: validData(), css: {disabled: !validData()}">總是開啟許可權控制</a>
+    </div>
+</div>
+
+<div id="network-otherDialogFactoryReset" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+		<h3>您確定嗎？</h3>
+	</div>
+	<div class="modal-body">
+		<p>這將會使您的印表機恢復到出廠設置！</p>
+		<p>您確定您要繼續操作嗎?</p>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">取消</a>
+		<a href="#" class="btn btn-danger" data-bind="click: function() { confirmFactoryReset(); }">繼續</a>
+	</div>
+</div>
+
+<div id="network-otherDialogConnectWifi" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+		<h3>連接WiFi熱點</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label" for="network-otherDialogConnectWifiName">WiFi名</label>
+				<div class="controls">
+					<!-- <input type="text" class="input-block-level" id="network-otherDialogConnectWifiName" data-bind="value: editorWifiName" required> -->
+					<select id="network-otherDialogConnectWifiName" data-bind="click: function() {getAvailableWifiNames();}, value: currentWifiName, options: availableWifiNames">
+					</select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="network-otherDialogConnectWifiPassword">密碼</label>
+				<div class="controls">
+					<input type="password" id="network-otherDialogConnectWifiPassword" data-bind="value: editorWifiPassword" required>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-bind="click: clearWifiInfo" data-dismiss="modal" aria-hidden="true">取消</button>
+		<button class="btn btn-primary" data-bind="click: function() { confirmConnectWifi(); }">確認</button>
+	</div>
+</div>
+
+<div id="network-otherDialogCreateWifi" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+		<h3>創建WiFi熱點</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label" for="network-otherDialogCreateWifiName">WiFi名</label>
+				<div class="controls">
+					<input type="text" id="network-otherDialogCreateWifiName" data-bind="value: editorWifiName" required>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="network-otherDialogCreateWifiPassword">密碼</label>
+				<div class="controls">
+					<input type="password" title="注意：密碼必須是八個及以上字元" id="network-otherDialogCreateWifiPassword" data-bind="value: editorWifiPassword" required>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-bind="click: clearWifiInfo" data-dismiss="modal" aria-hidden="true">取消</button>
+		<button class="btn btn-primary" data-bind="click: function() { confirmCreateWifi(); }">確認</button>
+	</div>
+</div>
